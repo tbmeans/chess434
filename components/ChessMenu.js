@@ -1,6 +1,4 @@
-import styles from './Header.module.css'
-
-export default function Menu() {
+export default function ChessMenu() {
 	return (
 	  <div id="chess-menu" className="navbar-menu">
 		<div className="navbar-start">

@@ -11,7 +11,7 @@ body {
 }
 
 main {
-  padding: 5rem 0;
+  padding: 1rem 0;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -28,80 +28,8 @@ code {
 }
 
 .container {
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* align-items: left; */
-}
-
-.board-background {
-	width: 72vh;
-	margin: auto;
-	position: relative;
-}
-.rank-and-or-file-label { 
-	/* btw, file-label collides with a Bulma class */ 
-	position: absolute; 
-} 
-.on-dark { 
-	color: white;
-}
-.grid-8-cols { 
-	font-size: 1.4vh; 
-	margin: auto; 
-	width: 64vh; 
-	height: 64vh; 
-	display: grid;
-	grid-template-columns: repeat(8, 8vh);
-	grid-auto-rows: 8vh; 
-}
-#chessboard img {
-	width: 8vh;
-	height: 8vh;
-}
-.woodgrain-theme, .greenbuff-theme {
-	background-color: #c2d9ed;
-}
-.woodgrain-theme > .lite {
-	background-color: #ffdead;
-}
-.woodgrain-theme > .dark {
-	background-color: #cd853f;
-}
-.greenbuff-theme > .lite {
-	background-color: #daa06d;
-}
-.greenbuff-theme > .dark {
-	background-color: #008000;
-}
-#chessboard > .has-legal { 
-	background-color: hsl(153, 53%, 53%); 
-} 
-#chessboard > .marked-lite {
-	background-color: hsl(207, 61%,53%); 
-} 
-#chessboard > .marked-dark {
-	background-color: hsl(229, 53%,53%); 
-} 
-#chessboard > .selected { 
-	background-color: hsl(171, 100%, 41%); 
-} 
-#chessboard > .temp-display-for-no-legal { 
-	background-color: hsl(44,100%, 77%); 
-} 
-#chessboard > .temp-display-for-has-legal { 
-	background-color: hsl(153, 53%, 53%); 
-}
-.clock-color { 
-	font-size: 3vh;
-}
-#hide-text-on-is-danger { 
-	color: hsl(348, 86%, 61%);
-}
-#green-note { 
-	padding-right: 1.5rem; 
-}
-#black-time, #white-time { 
-	font-size: 3vh;
+  align-items: left;
 }

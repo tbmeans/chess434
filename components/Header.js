@@ -1,5 +1,3 @@
-import styles from './Header.module.css'
-
 export default function Header({ title }) {
   return (
     <div id="my-logo" className="navbar-brand">
