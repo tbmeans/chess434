@@ -4,7 +4,11 @@
   border-top: 1px solid #eaeaea;
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* align-items: center;
+  */
+  flex-direction: column; /* chess434 */
+  background-color: white; /* chess434 */
+  padding-left: 1rem;  /* chess434 */
 }
 
 .logo {
