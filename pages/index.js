@@ -31,6 +31,7 @@ export default function Home() {
         </p>
       </main>
       */}
+      <Header title="Chess" />
 
       <Footer cred={cred} fnames={fnames} params={params} />
     </div>
