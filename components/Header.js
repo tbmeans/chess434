@@ -1,4 +1,4 @@
-import { header, pageTitle, logo, mobileLogo } from './Header.module.css'
+import { header, pageTitle, logo } from './Header.module.css'
 
 export default function Header({ title }) {
   {/* return <h1 className="title">{title}</h1> */}
