@@ -33,6 +33,14 @@ code {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
+}
+
+/* chess434 */
+@media only screen and (min-width: 1024px) {
+  #mobile-logo, #burger-icon {
+    visibility: hidden;
+    pointer-events: none;
+  }
 }
