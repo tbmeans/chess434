@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import Header from '@components/Header'
 import Footer from '@components/Footer'
+import GameGrid from '@components/GameGrid'
 
 const cred = {
   c: "Chess vector images",
@@ -32,6 +33,8 @@ export default function Home() {
       </main>
       */}
       <Header title="Chess" />
+
+      <GameGrid />
 
       <Footer cred={cred} fnames={fnames} params={params} />
     </div>

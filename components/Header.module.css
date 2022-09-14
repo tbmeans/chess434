@@ -14,3 +14,10 @@
   width: 5rem;
   height: 5rem;
 }
+
+@media only screen and (min-width: 1024px) {
+  .mobile {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

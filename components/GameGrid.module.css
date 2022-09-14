@@ -1,0 +1,53 @@
+.background {
+  width: 100%;
+  height: 100%;
+}
+
+.fourColCenterWide {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 6rem 1fr 1fr 6rem;
+  grid-template-rows: 6rem 1fr 6rem 10rem ;
+  gap: 1rem;
+}
+
+.burgerBox {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  background-color: white;
+  height: 6rem;
+}
+
+.center {
+  grid-column-start: 2;
+  grid-column-end: 4;
+}
+
+.upper {
+  grid-row: 2;
+}
+
+.bottom {
+  grid-row: 4;
+}
+
+.centerLeft {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row: 3;
+}
+
+.centerRight {
+  grid-column-start: 3;
+  grid-column-end: 4;
+  grid-row: 3;
+}
+
+@media only screen and (min-width: 1024px) {
+  .burgerBox {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
