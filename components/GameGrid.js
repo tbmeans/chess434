@@ -1,7 +1,5 @@
 import styles from './GameGrid.module.css'
 
-const { PGNSevenTagRoster, getGameStatus, cpuPlay } = engine.ui;
-
 const burgerSVG = (
   <svg id="burger-icon" height="5em" width="6em"
     xmlns="http://www.w3.org/2000/svg"
