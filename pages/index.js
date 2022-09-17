@@ -24,14 +24,7 @@ export default function Home() {
         <title>Chess I guess</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {/* // Not using Next.js template default main tag
-      <main>
-        <Header title="Welcome to my app!" />
-        <p className="description">
-          Get started by editing <code>pages/index.js</code>
-        </p>
-      </main>
-      */}
+
       <Header title="Chess" />
 
       <GameGrid />
