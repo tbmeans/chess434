@@ -1,5 +1,7 @@
 import styles from './GameGrid.module.css'
 
+const { PGNSevenTagRoster, getGameStatus, cpuPlay } = engine.ui;
+
 const burgerSVG = (
   <svg id="burger-icon" height="5em" width="6em"
     xmlns="http://www.w3.org/2000/svg"
@@ -27,23 +29,17 @@ const exBurgSVG = (
 export default function GameGrid(props) {
   return (
     <div className={styles.background}>
-      <div className={styles.fourColCenterWide}>
+      <div className={styles.triColCenterWide}>
         <div className={styles.burgerBox}>{burgerSVG}</div>
-        <div className={
-          [ styles.upper, styles.center ].join(' ')
-        }>
+        <div className={styles.flexPanels}>
           <div className="bg-box">chessboard</div>
-        </div>
-        <div className={styles.centerLeft}>
-          <div className="bg-box">W</div>
-        </div>
-        <div className={styles.centerRight}>
-          <div className="bg-box">B</div>
-        </div>
-        <div className={
-          [ styles.bottom, styles.center ].join(' ')
-        }>
-          <div className="bg-box">scoresheet</div>
+          <div className={styles.fourSquare}>
+            <div className="bg-box">W</div>
+            <div className="bg-box">B</div>
+            <div className={
+              [ "bg-box", styles.leftAndRight ].join(' ')
+            }>1.</div>
+          </div>
         </div>
       </div>
     </div>
