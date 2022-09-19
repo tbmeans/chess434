@@ -1,4 +1,10 @@
 import styles from './GameGrid.module.css'
+import engine from 'chess-sjppd/engine'
+import Chessboard from './Chessboard';
+
+const { PGNSevenTagRoster, getGameStatus, cpuPlay } = engine.ui;
+
+const pgn = new PGNSevenTagRoster;
 
 const burgerSVG = (
   <svg id="burger-icon" height="5em" width="6em"
@@ -24,19 +30,32 @@ const exBurgSVG = (
   </svg>
 );
 
-export default function GameGrid(props) {
+export default function GameGrid() {
+  const { position, legalMoves } = JSON.parse( getGameStatus('', pgn) );
+
   return (
     <div className={styles.background}>
       <div className={styles.triColCenterWide}>
         <div className={styles.burgerBox}>{burgerSVG}</div>
         <div className={styles.flexPanels}>
-          <div className="bg-box">chessboard</div>
+          <div className={styles.bgBox}>
+            <Chessboard
+              position={position}
+              legalMoves={legalMoves}
+              selected={"a2"}
+              colorTheme={"woodgrain"}
+            />
+          </div>
           <div className={styles.fourSquare}>
-            <div className="bg-box">W</div>
-            <div className="bg-box">B</div>
-            <div className={
-              [ "bg-box", styles.leftAndRight ].join(' ')
-            }>1.</div>
+            <div className={[ styles.bgBox, styles.clock ].join(' ')}>
+              W
+            </div>
+            <div className={[ styles.bgBox, styles.clock ].join(' ')}>
+              B
+            </div>
+            <div className={[ styles.bgBox, styles.leftAndRight ].join(' ')}>
+              1.
+            </div>
           </div>
         </div>
       </div>
