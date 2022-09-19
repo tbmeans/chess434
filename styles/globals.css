@@ -36,11 +36,3 @@ code {
   /* justify-content: center; /* commented out for chess434 */
   align-items: center;
 }
-
-/* chess434 */
-.bg-box {
-  background-color: white;
-  border: solid 0.5px #aaa;
-  border-radius: 0.2rem;
-  box-shadow: 2px 2px 0.2rem #777;
-}
