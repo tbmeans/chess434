@@ -1,0 +1,17 @@
+.onGreen {
+  background-color: green;
+  color: white;
+}
+
+.onYellow {
+  background-color: goldenrod;
+}
+
+.onRed {
+  background-color: red;
+  color: white;
+}
+
+.red {
+  color: red;
+}
