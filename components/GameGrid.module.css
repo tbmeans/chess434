@@ -37,7 +37,7 @@
 }
 
 .fourSquare {
-  margin-top: 2rem;
+  margin: 1rem 0 0 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
@@ -49,6 +49,9 @@
 }
 
 .clock {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
   text-align: center;
 }
 
@@ -63,5 +66,8 @@
   .flexPanels {
     flex-direction: row;
     justify-content: space-around;
+  }
+  .fourSquare {
+    margin: 0 0 0 2rem;
   }
 }

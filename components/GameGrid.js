@@ -1,10 +1,11 @@
 import styles from './GameGrid.module.css'
 import engine from 'chess-sjppd/engine'
 import Chessboard from './Chessboard';
+import ChessText from './ChessText';
 
 const { PGNSevenTagRoster, getGameStatus, cpuPlay } = engine.ui;
 
-const pgn = new PGNSevenTagRoster;
+const pgnInit = new PGNSevenTagRoster;
 
 const burgerSVG = (
   <svg id="burger-icon" height="5em" width="6em"
@@ -30,8 +31,17 @@ const exBurgSVG = (
   </svg>
 );
 
+const bgColorFor = {
+  "Has move": "onGreen",
+  "check": "onYellow",
+  "checkmate": "onRed",
+  "Made move": "onRed"
+};
+
 export default function GameGrid() {
-  const { position, legalMoves } = JSON.parse( getGameStatus('', pgn) );
+  const { position, legalMoves, white, black,
+    openingName, movetext, capturedList, gameover, pgn
+  } = JSON.parse( getGameStatus('', pgnInit) );
 
   return (
     <div className={styles.background}>
@@ -48,13 +58,18 @@ export default function GameGrid() {
           </div>
           <div className={styles.fourSquare}>
             <div className={[ styles.bgBox, styles.clock ].join(' ')}>
-              W
+              <ChessText text="W 1:00:00" />
+              <ChessText text={white} bgColor={bgColorFor[white]} />
             </div>
             <div className={[ styles.bgBox, styles.clock ].join(' ')}>
-              B
+              <ChessText text="B 1:00:00" />
+              <ChessText text={black} bgColor={bgColorFor[black]} />
             </div>
             <div className={[ styles.bgBox, styles.leftAndRight ].join(' ')}>
-              1.
+              <ChessText text={openingName} />
+              <ChessText text={movetext} />
+              <ChessText text={capturedList} />
+              <ChessText text={gameover} bgColor={null} color="red" />
             </div>
           </div>
         </div>
