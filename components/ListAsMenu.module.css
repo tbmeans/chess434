@@ -1,0 +1,14 @@
+.noBullets {
+  margin-right: 2rem;
+  padding: 0.3rem;
+  border-bottom: solid 1px #ccc;
+  list-style-type: none;
+}
+
+.hiLite:hover {
+  background-color: #80c0ff;
+}
+
+.hiLite:active {
+  background-color: green;
+}
