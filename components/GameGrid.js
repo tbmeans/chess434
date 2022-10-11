@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './GameGrid.module.css';
 import engine from 'chess-sjppd/engine';
 import Chessboard from './Chessboard';
@@ -68,6 +68,10 @@ const mainMenuIdxOfSubWithSub = [ 3 ];
 
 const idxOf1stItemWithSub = [ 6 ];
 
+const indexOfPawnPromotion = (
+  Object.keys( JSON.parse(menu) ).indexOf("Pawn Promotion")
+);
+
 const bgColor = JSON.stringify({
   "Has move": "onGreen",
   "check": "onYellow",
@@ -82,149 +86,70 @@ const stylesForNav = JSON.stringify({
   ghostedOut: styles.ghostedOut
 });
 
-const { PGNSevenTagRoster, getGameStatus, cpuPlay } = engine.ui;
-
-const { expand } = engine.console;
+const { PGNSevenTagRoster, getGameStatus, expand, cpuPlay } = engine.ui;
 
 const pgnInit = new PGNSevenTagRoster;
 
 export default function GameGrid() {
-  const isCloseButton = true;
-  const setIsCloseButton = x => x;
+  const [ isCloseButton, setIsCloseButton ] = useState(false);
+  const [ menuPathIdx, setMenuPathIdx ] = useState('');
+  const [ navUnlock, setNavUnlock ] = useState('1111');
+  const [ colorTheme, setColorTheme ] = useState("woodgrain");
+  const [ promotionChoice, setPromotionChoice ] = useState('');
+  const [ opponent, setOpponent ] = useState(-1);
+  const [ timeControlTag, setTimeControlTag ] = useState("-");
+  const [ whiteTimeIdx, setWhiteTimeIdx ] = useState(0);
+  const [ blackTimeIdx, setBlackTimeIdx ] = useState(0);
+  const [ whiteTime, setWhiteTime ] = useState(Infinity);
+  const [ blackTime, setBlackTime ] = useState(Infinity);
+  const [ runningTimerId, setRunningTimerId ] = useState(0);
+  const [ startIsDisabled, setStartIsDisabled ] = useState(false);
+  const [ resignIsDisabled, setResignIsDisabled ] = useState(true);
+  const [ promoteIsDisabled, setPromoteIsDisabled ] = useState(true);
+  const [ boardIsClickable, setBoardIsClickable ] = useState(false);
+  const [ sequence, setSequence ] = useState('');
+  const [ selectedOrigin, setSelectedOrigin ] = useState('');
+  const [ selectedTarget, setSelectedTarget ] = useState('');
 
-  const menuPathIdx = '';
-  const setMenuPathIdx = x => x;
-
-  const navUnlock = '1111';
-  const setNavUnlock = x => x;
-
-  const colorTheme = "woodgrain";
-  const setColorTheme = x => x;
-
-  const promotionChoice = '';
-  const setPromotionChoice = x => x;
-
-  const opponent = -1;
-  const setOpponent = x => x;
-
-  const timeControlTag = "-";
-  const setTimeControlTag = x => x;
-
-  const whiteTimeIdx = 0;
-  const setWhiteTimeIdx = x => x;
-
-  const blackTimeIdx = 0;
-  const setBlackTimeIdx = x => x;
-
-  const whiteTime = Infinity;
-  const setWhiteTime = x => x;
-
-  const blackTime = Infinity;
-  const setBlackTime = x => x;
-
-  const whiteButtonIsDown = false;
-  const setWhiteButtonIsDown = x => x;
-
-  const runningTimerId = 0;
-  const setRunningTimerId = x => x;
-
-  const startIsDisabled = false;
-  const setStartIsDisabled = x => x;
-
-  const resignIsDisabled = true;
-  const setResignIsDisabled = x => x;
-
-  const promoteIsDisabled = true;
-  const setPromoteIsDisabled = x => x;
-
-  const boardIsClickable = false;
-  const setBoardIsClickable = x => x;
-
-  const sequence = '';
-  const setSequence = x => x;
-
-  const selectedOrigin = 'a2';
-  const setSelectedOrigin = x => x;
-
-  const selectedTarget = '';
-  const setSelectedTarget = x => x;
-
-  const parseTC = tag => {
-    return Object.freeze(tag.split(':').map(field => {
-      if (field === "-") {
-        return Object.freeze({ init: Infinity, bonus: 0, goal: 0 });
-      }
-      return Object.freeze({
-        init: parseInt(field.split('/').at(-1).split('+')[0]),
-        bonus: parseInt(field.split('+')[1]) || 0,
-        goal: parseInt( field.split('/').at(-2) ) || 0
-      });
-    }));
-  };
-
-  const incr = (csv, v) => {
-    return (csv.length ? csv.split(',') : []).concat([ v ]).join();
-  };
-
-  const hmmss = totalSeconds => {
-    return [
-      Math.floor(totalSeconds / 60 / 60),
-      Math.floor(totalSeconds / 60) % 60,
-      totalSeconds % 60
-    ].map( (x, i) => `${x}`.padStart( (i ? 2 : 1), 0 ) ).join(':');
-  };
-
-  const timeToString = t => t === Infinity ? '\u221E' : hmmss(t);
-
-  const indexOfPawnPromotion = (
-    Object.keys( JSON.parse(menu) ).indexOf("Pawn Promotion")
-  );
-
-  const { position, legalMoves, white, black,
-    openingName, movetext, capturedList, gameover, pgn
+  /* Derivations from state */
+  const tc = parseTC(timeControlTag);
+  const initTime = tc[0].init;
+  const plyCount = sequence ? sequence.split(',').length : 0;
+  const bonus = tc[plyCount % 2 ? blackTimeIdx : whiteTimeIdx].bonus;
+  const setTime = plyCount % 2 ? setBlackTime : setWhiteTime;
+  const {
+    position,
+    legalMoves,
+    white,
+    black,
+    openingName,
+    movetext,
+    capturedList,
+    gameover,
+    pgn
   } = JSON.parse( getGameStatus(sequence, pgnInit) );
 
-  const plyCount = sequence ? sequence.split(',').length : 0;
-
-  if (startIsDisabled && whiteTime < Infinity) {
-    const tc = parseTC(timeControlTag);
-    const whiteGoal = tc[whiteTimeIdx].goal;
-    const blackGoal = tc[blackTimeIdx].goal;
-    const whiteMoves = Math.ceil(plyCount / 2);
-    const blackMoves = Math.floor(plyCount / 2);
-
-    if (whiteMoves === whiteGoal && whiteTimeIdx < tc.length - 1) {
-      setWhiteTime(t => t + tc[whiteTimeIdx + 1].init);
-      setWhiteTimeIdx(i => i + 1);
-    } else if (whiteTime <= 0) {
-      clearInterval(runningTimerId);
-      setWhiteTime(0);
-      setSequence( s => incr(s, 'T') );
-    }
-
-    if (blackMoves === blackGoal && blackTimeIdx < tc.length - 1) {
-      setBlackTime(t => t + tc[blackTimeIdx + 1].init);
-      setBlackTimeIdx(i => i + 1);
-    } else if (blackTime <= 0) {
-      clearInterval(runningTimerId);
-      setBlackTime(0);
-      setSequence( s => incr(s, 'T') );
-    }
-
-    useEffect( () => {
-      const setTime = whiteButtonIsDown ? setBlackTime : setWhiteTime;
-      setRunningTimerId(
-        setInterval( () => setTime(t => t - 1), 1000 )
-      );
+  // Run the chess clocks if applicable
+  useEffect( () => {
+    if (initTime === Infinity || startIsDisabled === false) {
+      setRunningTimerId(null);
       return;
-    }, [ whiteButtonIsDown ] );
-  }
+    }
+    setRunningTimerId(
+      setInterval( () => setTime(t => t - 1), 1000 )
+    );
+    return;
+  }, [ timeControlTag, startIsDisabled, sequence ] );
 
-  if (opponent > -1 && plyCount % 2 === opponent) {
-    const bonus = parseTC(timeControlTag)[(
-      whiteButtonIsDown ? blackTimeIdx : whiteTimeIdx
-    )].bonus;
-    const setTime = whiteButtonIsDown ? setBlackTime : setWhiteTime;
+  // Play vs CPU with faux CPU thinking time effect
+  useEffect( () => {
+    if (
+      startIsDisabled === false ||
+      opponent === -1 ||
+      plyCount % 2 !== opponent
+    ) {
+      return;
+    }
     const move = cpuPlay(legalMoves);
     const piece = expand(position.split(' ')[0], true)[
       "abcdefgh".indexOf(move[0]) - 8 * move[1] + 64
@@ -234,36 +159,65 @@ export default function GameGrid() {
       piece === 'p' && move.at(-1) == 1
     );
     const pcn = move + (isPromotion ? 'q' : '');
+    const id = setTimeout( () => {
+      clearInterval(runningTimerId)
+      setTime(t => t + bonus);
+      setSequence( s => incr(s, pcn) );
+      setWhiteButtonIsDown(v => !v);
+      clearInterval(id);
+      return;
+    }, 5000 );
+    return;
+  });
 
-    useEffect( () => {
-      const id = setTimeout( () => {
-        clearInterval(timerId);
-        setTime(t => t + bonus);
-        setSequence( s => incr(s, pcn) );
-        setWhiteButtonIsDown(v => !v);
-        clearInterval(id);
-        return;
-      }, 5000 );
-    } );
-  }
+  // Handle end of game
+  useEffect( () =>  {
+    if (gameover) {
+      setResignIsDisabled(true);
+      clearInterval(runningTimerId);
+      setBoardIsClickable(false);
+      console.log(pgn);
+    }
+    return;
+  });
 
-  if (gameover) {
-    setResignIsDisabled(true);
-    clearInterval(runningTimerId);
-    setBoardIsClickable(false);
-    useEffect( () => console.log(pgn) );
-  }
-
+  // Menu should permanently display in desktop mode
   useEffect( () => {
-    window.addEventListener("resize", e => {
+    const menuToggle = () => {
       if (window.innerWidth < 1024) {
         setIsCloseButton(false);
       } else {
         setIsCloseButton(true);
       }
-    });
+      return;
+    };
+    menuToggle();
+    window.addEventListener("resize", menuToggle);
     return;
   }, [] );
+
+  // Handle meeting move goal and flag fall
+  if (startIsDisabled && whiteTime < Infinity && gameover.length === 0) {
+    const whiteStuff = [
+      whiteTime, whiteTimeIdx, setWhiteTimeIdx, tc[whiteTimeIdx].goal
+    ];
+    const blackStuff = [
+      blackTime, blackTimeIdx, setBlackTimeIdx, tc[blackTimeIdx].goal
+    ];
+    const [ time, timeIdx, setTimeIdx, goal ] = (
+      plyCount % 2 ? blackStuff : whiteStuff
+    );
+    const moves = (plyCount % 2 ? Math.floor : Math.ceil)(plyCount / 2);
+
+    if (moves === goal && timeIdx < tc.length - 1) {
+      setTime(t => t + tc[timeIdx + 1].init);
+      setTimeIdx(i => i + 1);
+    } else if (time <= 0) {
+      clearInterval(runningTimerId);
+      setTime(0);
+      setSequence( s => incr(s, 'T') );
+    }
+  }
 
   return (
     <div className={styles.background}>
@@ -288,7 +242,7 @@ export default function GameGrid() {
           setUnlock={setNavUnlock}
           disabled1={startIsDisabled}
           setDisab1={setStartIsDisabled}
-          initTime={parseTC(timeControlTag)[0].init}
+          initTime={initTime}
           setWhite={setWhiteTime}
           setBlack={setBlackTime}
           disabled2={resignIsDisabled}
@@ -303,14 +257,8 @@ export default function GameGrid() {
           seqIncr={incr}
           setMoveSeq={setSequence}
           timerId={runningTimerId}
-          bonus={parseTC(timeControlTag)[(
-            position.split(' ')[1] === 'w' ?
-            whiteTimeIdx : blackTimeIdx
-          )].bonus}
-          setTime={position.split(' ')[1] === 'w' ?
-            setWhiteTime : setBlackTime
-          }
-          setIsDown={setWhiteButtonIsDown}
+          bonus={bonus}
+          setTime={setTime}
         />
         <div className={styles.flexPanels}>
           <div className={styles.bgBox}>
@@ -330,14 +278,8 @@ export default function GameGrid() {
               seqIncr={incr}
               setSeq={setSequence}
               timerId={runningTimerId}
-              bonus={parseTC(timeControlTag)[(
-                position.split(' ')[1] === 'w' ?
-                whiteTimeIdx : blackTimeIdx
-              )].bonus}
-              setTime={position.split(' ')[1] === 'w' ?
-                setWhiteTime : setBlackTime
-              }
-              setIsDown={setWhiteButtonIsDown}
+              bonus={bonus}
+              setTime={setTime}
             />
           </div>
           <div className={styles.fourSquare}>
@@ -389,4 +331,33 @@ function ChessText({ text, bgColor, color }) {
       ).join(' ')
     }>{text}</p>
   );
+}
+
+const parseTC = tag => {
+  return Object.freeze(tag.split(':').map(field => {
+    if (field === "-") {
+      return Object.freeze({ init: Infinity, bonus: 0, goal: 0 });
+    }
+    return Object.freeze({
+      init: parseInt(field.split('/').at(-1).split('+')[0]),
+      bonus: parseInt(field.split('+')[1]) || 0,
+      goal: parseInt( field.split('/').at(-2) ) || 0
+    });
+  }));
+};
+
+function incr(csv, v) {
+  return (csv.length ? csv.split(',') : []).concat([ v ]).join();
+}
+
+function hmmss(totalSeconds) {
+  return [
+    Math.floor(totalSeconds / 60 / 60),
+    Math.floor(totalSeconds / 60) % 60,
+    totalSeconds % 60
+  ].map( (x, i) => `${x}`.padStart( (i ? 2 : 1), 0 ) ).join(':');
+};
+
+function timeToString(t) {
+  return t === Infinity ? '\u221E' : hmmss(t);
 }

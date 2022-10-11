@@ -15,10 +15,9 @@ export default function Chessboard(props) {
     "abcdefgh".indexOf(props.org[0]) - 8 * props.org[1] + 64
   );
 
-  const piece = Object.freeze(
-    { b: 'bishop', k: 'king', n: 'knight',
-    p: 'pawn', q: 'queen', r: 'rook' }
-  );
+  const piece = Object.freeze({
+    b: 'bishop', k: 'king', n: 'knight', p: 'pawn', q: 'queen', r: 'rook'
+  });
 
   const activeColorIsWhite = props.pos.split(' ')[1] === 'w';
 
@@ -111,7 +110,6 @@ export default function Chessboard(props) {
                   props.setTime(t => t + props.bonus);
                   props.setSeq( s => props.seqIncr(s, pcn) );
                   props.setOrg('');
-                  props.setIsDown(v => !v);
                 }
               } else if (isSelectedSquare) {
                 props.setOrg('');

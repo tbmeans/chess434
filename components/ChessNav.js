@@ -48,7 +48,6 @@ export default function ChessNav(props) {
             props.setMoveSeq( s => props.seqIncr(s, proMove) );
             props.setBoard(true);
             props.setOrg('');
-            props.setIsDown(v => !v);
             return;
           }
         )}>Promote</div>
