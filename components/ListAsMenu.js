@@ -7,16 +7,19 @@ export default function ListAsMenu(props) {
         return (
           <li key={i}
             className={[ noBullets, hiLite ].join(' ')}
-            onClick={ (props.unlocked || null) && ( () => {
-              if (props.setValue) {
-                props.setValue[ props.index[0] ](
-                  props.values[props.index.at(-1)]
-                );
-                return;
-              }
-              props.setIndex(props.exit(i) ? '' : props.index + i);
-              return;
-            })}
+            onClick={
+              (props.unlocked || null) && (
+                () => {
+                  if ( props.isLeaf(props.path + i) ) {
+                    props.setValue[ props.path[0] ](props.values[i]);
+                    props.setPath('');
+                  } else {
+                    props.setPath(props.path + i);
+                  }
+                  return;
+                }
+              )
+            }
           >{s}</li>
         );
       })}
