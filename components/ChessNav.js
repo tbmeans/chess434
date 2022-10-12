@@ -2,7 +2,7 @@ import ListAsMenu from './ListAsMenu'
 
 export default function ChessNav(props) {
   const menu = JSON.parse(props.tree);
-  const tcObj = menu[ Object.keys(menu)[ props.hasSub[0] ] ];
+  const obj = menu[ Object.keys(menu)[ props.path[0] ] ];
   const proMove = props.org + props.tgt + (props.pro || 'q');
 
   return props.isViz && (
@@ -10,11 +10,12 @@ export default function ChessNav(props) {
       <div className={props.sty.bgBox}>
         <ListAsMenu
           list={Object.keys(menu)}
-          index={props.path}
-          setIndex={props.setPath}
+          path={props.path}
+          setPath={props.setPath}
+          isLeaf={props.isLeaf}
+          values={null}
           setValue={null}
           unlocked={true}
-          exit={itemIdx => false}
         />
         <div className={[ props.sty.button ].concat(
           props.disabled1 ? [ props.sty.ghostedOut ] : []
@@ -56,33 +57,29 @@ export default function ChessNav(props) {
         <div className={props.sty.bgBox}>
           <ListAsMenu
             list={Object.keys(menu[ Object.keys(menu)[ props.path[0] ] ])}
-            index={props.path}
-            setIndex={props.setPath}
+            path={props.path}
+            setPath={props.setPath}
+            isLeaf={props.isLeaf}
             values={Object.values(menu[ Object.keys(menu)[ props.path[0] ] ])}
             setValue={props.setters}
             unlocked={props.unlock[ props.path[0] ] ? true : false}
-            exit={itemIdx => {
-              return (
-                props.path[0] != props.hasSub[0] || itemIdx < props.subLo[0]
-              );
-            }}
           />
         </div>
       }
-      {props.path[0] == props.hasSub[0] && props.path[1] >= props.subLo[0] &&
+      {(props.path.length === 2 && props.isLeaf(props.path) === false) &&
         <div className={props.sty.bgBox}>
           <ListAsMenu
-            list={Object.keys(tcObj[
-              Object.keys(tcObj)[ props.path[1] ]
+            list={Object.keys(obj[
+              Object.keys(obj)[ props.path[1] ]
             ])}
-            index={props.path}
-            setIndex={props.setPath}
-            values={Object.values(tcObj[
-              Object.keys(tcObj)[ props.path[1] ]
+            path={props.path}
+            setPath={props.setPath}
+            isLeaf={props.isLeaf}
+            values={Object.values(obj[
+              Object.keys(obj)[ props.path[1] ]
             ])}
             setValue={props.setters}
-            unlocked={props.unlock[ props.hasSub[0] ] ? true : false}
-            exit={itemIdx => true}
+            unlocked={props.unlock[ props.path[0] ] ? true : false}
           />
         </div>
       }
