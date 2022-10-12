@@ -64,9 +64,13 @@ const menu = JSON.stringify({
   }
 });
 
-const mainMenuIdxOfSubWithSub = [ 3 ];
-
-const idxOf1stItemWithSub = [ 6 ];
+const isLeaf = s => {
+  return (
+    s.length === 3 ||
+    s.length === 2 &&
+    (s[0] < 3 || s[1] < 6)
+  );
+};
 
 const indexOfPawnPromotion = (
   Object.keys( JSON.parse(menu) ).indexOf("Pawn Promotion")
@@ -150,6 +154,8 @@ export default function GameGrid() {
     ) {
       return;
     }
+    console.log(plyCount % 2)
+    console.log(opponent)
     const move = cpuPlay(legalMoves);
     const piece = expand(position.split(' ')[0], true)[
       "abcdefgh".indexOf(move[0]) - 8 * move[1] + 64
@@ -163,12 +169,11 @@ export default function GameGrid() {
       clearInterval(runningTimerId)
       setTime(t => t + bonus);
       setSequence( s => incr(s, pcn) );
-      setWhiteButtonIsDown(v => !v);
       clearInterval(id);
       return;
     }, 5000 );
     return;
-  });
+  }, [ startIsDisabled, opponent, sequence ] );
 
   // Handle end of game
   useEffect( () =>  {
@@ -179,7 +184,7 @@ export default function GameGrid() {
       console.log(pgn);
     }
     return;
-  });
+  }, [ sequence ] );
 
   // Menu should permanently display in desktop mode
   useEffect( () => {
@@ -228,12 +233,11 @@ export default function GameGrid() {
         />
         <ChessNav
           sty={JSON.parse(stylesForNav)}
-          tree={menu}
           isViz={isCloseButton}
+          tree={menu}
           path={menuPathIdx}
           setPath={setMenuPathIdx}
-          hasSub={mainMenuIdxOfSubWithSub}
-          subLo={idxOf1stItemWithSub}
+          isLeaf={isLeaf}
           setters={
             [ setColorTheme, setPromotionChoice,
             setOpponent, setTimeControlTag ]
@@ -287,7 +291,9 @@ export default function GameGrid() {
               <ChessText text={
                 [ "W",
                   opponent > -1 ? (opponent ? "visitor" : "CPU") : "visitor",
-                  whiteTime < 1 ? "0:00:00" : timeToString(whiteTime)
+                  whiteTime < 1 ? "0:00:00" : timeToString(
+                    startIsDisabled === false ? tc[0].init : whiteTime
+                  )
                 ].join(' ')
               } />
               <ChessText text={white} bgColor={JSON.parse(bgColor)[white]} />
@@ -296,7 +302,9 @@ export default function GameGrid() {
               <ChessText text={
                 [ "B",
                   opponent > -1 ? (opponent ? "CPU" : "visitor") : "visitor",
-                  blackTime < 1 ? "0:00:00" : timeToString(blackTime)
+                  blackTime < 1 ? "0:00:00" : timeToString(
+                    startIsDisabled === false ? tc[0].init : blackTime
+                  )
                 ].join(' ')
               } />
               <ChessText text={black} bgColor={JSON.parse(bgColor)[black]} />
