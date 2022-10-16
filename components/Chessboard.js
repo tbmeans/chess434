@@ -11,9 +11,9 @@ export default function Chessboard(props) {
     ).map( pcn => pcn.slice(2, 4) )
   );
 
-  const indexOfSelected = (
+  const selSq = props.org ? (
     "abcdefgh".indexOf(props.org[0]) - 8 * props.org[1] + 64
-  );
+  ) : '';
 
   const piece = Object.freeze({
     b: 'bishop', k: 'king', n: 'knight', p: 'pawn', q: 'queen', r: 'rook'
@@ -56,10 +56,11 @@ export default function Chessboard(props) {
         const isTargetSquare = movesFromSel.includes(file + rank);
 
         const isPromotionMove = (
-          isTargetSquare &&
-          (activeColorIsWhite && rank == 8 ||
-          activeColorIsWhite === false && rank == 1) &&
-          ppd64[indexOfSelected] === (activeColorIsWhite ? 'P' : 'p')
+          isTargetSquare && (
+            activeColorIsWhite && rank == 8 ||
+            activeColorIsWhite === false && rank == 1
+          ) &&
+          props.pieceOn(selSq, ppd64) === (activeColorIsWhite ? 'P' : 'p')
         );
 
         const imgTitle = (n == 1 ?
@@ -101,13 +102,9 @@ export default function Chessboard(props) {
               if (isTargetSquare) {
                 if (isPromotionMove) {
                   props.setTgt(file + rank);
-                  props.setIsActive(false);
-                  props.setMenu(props.pro);
-                  props.setProDisabled(false);
+                  props.setGame(props.isHeld);
                 } else {
                   const pcn = props.org + file + rank;
-                  clearInterval(props.timerId);
-                  props.setTime(t => t + props.bonus);
                   props.setSeq( s => props.seqIncr(s, pcn) );
                   props.setOrg('');
                 }
