@@ -10,7 +10,9 @@ export default function ListAsMenu(props) {
             onClick={
               (props.unlocked || null) && (
                 () => {
-                  if ( props.isLeaf(props.path + i) ) {
+                  if (props.path.length > props.pathLength) {
+                    props.setPath('');
+                  } else if ( props.isLeaf(props.path + i) ) {
                     props.setValue[ props.path[0] ](props.values[i]);
                     props.setPath('');
                   } else {
