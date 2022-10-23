@@ -17,7 +17,7 @@ export default function WikimediaCredit(props) {
     props.mediaCurids.map( (curid, i) => {
       return (
         <span key={curid}>
-          {i ? ', ' : ''}
+          {i ? ', ' : ' '}
           <a href={commons + curid}>
             {props.mediaFileids[i]}
           </a>
@@ -28,13 +28,17 @@ export default function WikimediaCredit(props) {
 
   return (
     <p>
-      {props.content + " "}
+      {props.content}
       {sources}
-      {" by "}
-      <a href={credUrl}>{credText}</a>
-      {" - Own work, "}
-      <a href={licUrl}>{licText}</a>
-      {", via Wikimedia Commons"}
+      {[ '', 'by', '' ].join(' ')}
+      <a href={credUrl}>
+        {credText}
+      </a>
+      {[ '', '-', 'Own', 'work,', '' ].join(' ')}
+      <a href={licUrl}>
+        {licText}
+      </a>
+      {[ ',', 'via', 'Wikimedia', 'Commons' ].join(' ')}
     </p>
   );
 }
