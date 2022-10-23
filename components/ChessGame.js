@@ -20,7 +20,7 @@ export default function ChessGame(props) {
   const [ isCloseButton, setIsCloseButton ] = useState(false);
   const [ menuPath, setMenuPath ] = useState('');
   const [ colorTheme, setColorTheme ] = useState("woodgrain");
-  const [ promotionChoice, setPromotionChoice ] = useState('');
+  const [ promotionChoice, setPromotionChoice ] = useState('q');
   const [ opponent, setOpponent ] = useState(-1);
   const [ timeControlTag, setTimeControlTag ] = useState("-");
   const [ gameIsOver, setGameIsOver ] = useState(-1);
@@ -31,6 +31,7 @@ export default function ChessGame(props) {
   const [ sequence, setSequence ] = useState('');
   const [ selectedOrigin, setSelectedOrigin ] = useState('');
   const [ selectedTarget, setSelectedTarget ] = useState('');
+  const [ isMobile, setIsMobile ] = useState(null);
 
   const {
     position,
@@ -71,9 +72,10 @@ export default function ChessGame(props) {
       return;
     }
     const tc = parseTC(timeControlTag);
+    const hasEndSign = sequence.split(',').at(-1).match(/[DRT]/);
     const whiteStuff = [
       { w: -1, b: 0 },
-      tc[whiteTimeIdx].bonus,
+      hasEndSign ? 0 : tc[whiteTimeIdx].bonus,
       tc[whiteTimeIdx].goal,
       Math.ceil(plyCount / 2),
       tc[whiteTimeIdx + 1]?.init || 0,
@@ -82,7 +84,7 @@ export default function ChessGame(props) {
     ];
     const blackStuff = [
       { w: 0, b: -1 },
-      tc[blackTimeIdx].bonus,
+      hasEndSign ? 0 : tc[blackTimeIdx].bonus,
       tc[blackTimeIdx].goal,
       Math.floor(plyCount / 2),
       tc[blackTimeIdx + 1]?.init || 0,
@@ -138,8 +140,10 @@ export default function ChessGame(props) {
     const menuToggle = () => {
       if (window.innerWidth < 1024) {
         setIsCloseButton(false);
+        setIsMobile(true);
       } else {
         setIsCloseButton(true);
+        setIsMobile(false);
       }
       return;
     };
@@ -155,6 +159,7 @@ export default function ChessGame(props) {
       xBtn={props.closeButton}
       burg={props.hamburger}
       tree={props.menu}
+      isMobile={isMobile}
       path={menuPath}
       setPath={setMenuPath}
       isLeaf={props.isLeaf}
@@ -257,15 +262,18 @@ function timeToString(t) {
 }
 
 function GameGrid(props) {
+  const burgerToggle = () => props.setIsX(!props.isX);
+  const boxedTimer = [ styles.bgBox, styles.clock ].join(' ');
+
   return (
     <div className={styles.background}>
       <div className={styles.triColCenterWide}>
-        <div
-          className={styles.burgerBox}
-          onClick={() => props.setIsX(!props.isX)}
-        >{props.isX ? props.xBtn : props.burg}</div>
+        <div className={styles.burgerBox} onClick={burgerToggle}>
+          {props.isX ? props.xBtn : props.burg}
+        </div>
         <ChessNav
           isViz={props.isX}
+          isMobile={props.isMobile}
           tree={props.tree}
           path={props.path}
           setPath={props.setPath}
@@ -300,6 +308,8 @@ function GameGrid(props) {
               setTgt={props.setTgt}
               isHeld={-2}
               setGame={props.setGame}
+              setMenu={props.setPath}
+              openMenu={props.setIsX}
               seqIncr={incr}
               setSeq={props.setSeq}
               setTime={
@@ -309,25 +319,37 @@ function GameGrid(props) {
             />
           </div>
           <div className={styles.fourSquare}>
-            <div className={[ styles.bgBox, styles.clock ].join(' ')}>
-              <ChessText text={
-                [ "W",
-                  props.vs > -1 ? (props.vs ? "visitor" : "CPU") : "visitor",
+            <div className={boxedTimer}>
+              <ChessText
+                text={
+                  "Player: " + (
+                    props.vs > -1 && (
+                      props.vs && "visitor" || "CPU"
+                    ) || "visitor"
+                  ) +
+                  '\n' +
+                  "White's time remaining " +
                   timeToString(props.whiteTime)
-                ].join(' ')
-              } />
+                }
+              />
               <ChessText
                 text={props.gameStat.white}
                 bgColor={props.bg[props.gameStat.white]}
               />
             </div>
-            <div className={[ styles.bgBox, styles.clock ].join(' ')}>
-              <ChessText text={
-                [ "B",
-                  props.vs > -1 ? (props.vs ? "CPU" : "visitor") : "visitor",
+            <div className={boxedTimer}>
+              <ChessText
+                text={
+                  "Player: " + (
+                    props.vs > -1 && (
+                      props.vs && "CPU" || "visitor"
+                    ) || "visitor"
+                  ) +
+                  '\n' +
+                  "Black's time remaining " +
                   timeToString(props.blackTime)
-                ].join(' ')
-              } />
+                }
+              />
               <ChessText
                 text={props.gameStat.black}
                 bgColor={props.bg[props.gameStat.black]}
@@ -350,99 +372,200 @@ function GameGrid(props) {
   );
 }
 
+function getNodeValue(tree, path, depth = path.length) {
+  if (depth == 0) {
+    return Object.freeze(tree);
+  }
+  return Object.freeze(
+    getNodeValue(tree, path, depth - 1)[
+      Object.keys(
+        getNodeValue(tree, path, depth - 1)
+      )[ path[depth - 1] ]
+    ]
+  );
+}
+
 function ChessNav(props) {
-  const menu = JSON.parse(props.tree);
-  const obj = menu[ Object.keys(menu)[ props.path[0] ] ];
+  if (props.isViz == false) {
+    return null;
+  }
+
   const disabled = Object.freeze(
     props.disabled.split('').map(x => parseInt(x) ? true : false)
   );
 
-  return props.isViz && (
-    <nav className={styles.underBurger}>
-      <div className={styles.bgBox}>
+  const btn = bitIdx => {
+    return [ styles.button ].concat(
+      disabled[bitIdx] && [ styles.ghostedOut ] || (
+        bitIdx == 2 && [ styles.blinking ] || []
+      )
+    ).join(' ');
+  };
+
+  const enable = bitIdx => !disabled[bitIdx] || null;
+
+  const startGame = () => {
+    props.setWhiteTime(props.initTime);
+    props.setBlackTime(props.initTime);
+    props.setGame(props.isInProgress);
+    return;
+  };
+
+  const resign = () => props.setSeq( s => props.seqIncr(s, 'R') );
+
+  const promotePawn = () => {
+    const pcn = props.org + props.tgt + props.pro;
+    props.setSeq( s => props.seqIncr(s, pcn) );
+    props.setGame(props.isInProgress);
+    return;
+  };
+
+  const sta = enable(0) && startGame;
+
+  const res = enable(1) && resign;
+
+  const pro = enable(2) && promotePawn;
+
+  const buttons = (
+    <>
+      <div className={btn(0)} onClick={sta}>
+        Start
+      </div>
+      <div className={btn(1)} onClick={res}>
+        Resign
+      </div>
+      <div className={btn(2)} onClick={pro}>
+        Promote
+      </div>
+    </>
+  );
+
+  const tree = JSON.parse(props.tree);
+
+  const treeDisplay = (path, index = 0) => {
+    const headingOnly = heading => Object.freeze([ heading, null ]);
+    const headingAndSub = (heading, i) => {
+      return [
+        heading,
+        i == path[index] && (
+          treeDisplay(path, index + 1)
+        ) || null
+      ];
+    };
+    const values = index > 0 && (
+      Object.values( getNodeValue(tree, path, index) )
+    ) || null;
+    const setters = index > 0 && props.setters || null;
+    const unlocked = (
+      index > 0 && parseInt(props.unlocked[ path[index] ]) || true
+    );
+    if (index === path.length) {
+      const terminalMenu = (
         <ListAsMenu
-          pathLength={0}
-          list={Object.keys(menu)}
-          path={props.path}
+          pathLength={index}
+          list={Object.keys( getNodeValue(tree, path) ).map(headingOnly)}
+          path={path}
           setPath={props.setPath}
           isLeaf={props.isLeaf}
-          values={null}
-          setValue={null}
-          unlocked={true}
+          values={values}
+          setValue={setters}
+          unlocked={unlocked}
         />
-
-        <div className={[ styles.button ].concat(
-          disabled[0] ? [ styles.ghostedOut ] : []
-        ).join(' ')} onClick={ (!disabled[0] || null) && (
-          () => {
-            props.setWhiteTime(props.initTime);
-            props.setBlackTime(props.initTime);
-            props.setGame(props.isInProgress);
-            return;
-          }
-        )}>Start</div>
-
-        <div className={[ styles.button ].concat(
-          disabled[1] ? [ styles.ghostedOut ] : []
-        ).join(' ')} onClick={ (!disabled[1] || null) && (
-          () => props.setSeq( s => props.seqIncr(s, 'R') )
-        )}>Resign</div>
-
-        <div className={[ styles.button ].concat(
-          disabled[2] ? [ styles.ghostedOut ] : []
-        ).join(' ')} onClick={ (!disabled[2] || null) && (
-          () => {
-            const pcn = props.org + props.tgt + props.pro;
-            props.setSeq( s => props.seqIncr(s, pcn) );
-            props.setGame(props.isInProgress);
-            return;
-          }
-        )}>Promote</div>
-
-      </div>
-      {props.path.length > 0 &&
-        <div className={styles.bgBox}>
+      );
+      return (
+        props.isMobile && (
+          index == 0 && (
+            <div className={styles.bgBox}>
+              {terminalMenu}
+              {buttons}
+            </div>
+          ) || terminalMenu
+        ) || (
+          <div className={styles.bgBox}>
+            {terminalMenu}
+            {index == 0 && buttons || null}
+          </div>
+        )
+      );
+    }
+    return (
+      props.isMobile && (
+        index == 0 && (
+          <div className={styles.bgBox}>
+            <ListAsMenu
+              pathLength={index}
+              list={
+                Object.keys(
+                  getNodeValue(tree, path, index)
+                ).map(headingAndSub)
+              }
+              path={path}
+              setPath={props.setPath}
+              isLeaf={props.isLeaf}
+              values={values}
+              setValue={setters}
+              unlocked={unlocked}
+            />
+            {buttons}
+          </div>
+        ) || (
           <ListAsMenu
-            pathLength={1}
-            list={Object.keys(menu[ Object.keys(menu)[ props.path[0] ] ])}
-            path={props.path}
+            pathLength={index}
+            list={
+              Object.keys(
+                getNodeValue(tree, path, index)
+              ).map(headingAndSub)
+            }
+            path={path}
             setPath={props.setPath}
             isLeaf={props.isLeaf}
-            values={Object.values(menu[ Object.keys(menu)[ props.path[0] ] ])}
-            setValue={props.setters}
-            unlocked={props.unlocked[ props.path[0] ] ? true : false}
+            values={values}
+            setValue={setters}
+            unlocked={unlocked}
           />
-        </div>
-      }
-      {(props.path.length === 2 && props.isLeaf(props.path) === false) &&
-        <div className={styles.bgBox}>
-          <ListAsMenu
-            pathLength={2}
-            list={Object.keys(obj[
-              Object.keys(obj)[ props.path[1] ]
-            ])}
-            path={props.path}
-            setPath={props.setPath}
-            isLeaf={props.isLeaf}
-            values={Object.values(obj[
-              Object.keys(obj)[ props.path[1] ]
-            ])}
-            setValue={props.setters}
-            unlocked={props.unlocked[ props.path[0] ] ? true : false}
-          />
-        </div>
-      }
+        )
+      ) || (
+        <>
+          <div className={styles.bgBox}>
+            <ListAsMenu
+              pathLength={index}
+              list={
+                Object.keys(
+                  getNodeValue(tree, path, index)
+                ).map(headingOnly)
+              }
+              path={path}
+              setPath={props.setPath}
+              isLeaf={props.isLeaf}
+              values={values}
+              setValue={setters}
+              unlocked={unlocked}
+            />
+            {index == 0 && buttons || null}
+          </div>
+          {treeDisplay(path, index + 1)}
+        </>
+      )
+    );
+  };
+
+  return (
+    <nav className={styles.underBurger}>
+      {treeDisplay(props.path)}
     </nav>
   );
 }
 
 function ChessText({ text, bgColor, color }) {
+  const padAndColor = [ styles.padded ].concat(
+    bgColor ? [ styles[bgColor] ] : []
+  ).concat(
+    color ? [ styles[color] ] : []
+  ).join(' ');
+
   return (
-    <p className={[ styles.padded ].concat(
-        bgColor ? [ styles[bgColor] ] : []
-      ).concat(
-        color ? [ styles[color] ] : []
-      ).join(' ')
-    }>{text}</p>
+    <p className={padAndColor}>
+      {text}
+    </p>
   );
 }
