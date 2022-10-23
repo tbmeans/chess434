@@ -8,10 +8,17 @@ export default function Footer({ cred, fnames, params }) {
   return (
     <>
       <footer className={styles.footer}>
-        <p>2022, Tim Means</p>
+        <p>
+          2022, Tim Means
+        </p>
         <WikimediaCredit
-          content={content} lang={lang} user={user} lic={lic}
-          ver={ver} mediaFileids={fileids} mediaCurids={curids}
+          content={content}
+          lang={lang}
+          user={user}
+          lic={lic}
+          ver={ver}
+          mediaFileids={fileids}
+          mediaCurids={curids}
         />
       </footer>
     </>
