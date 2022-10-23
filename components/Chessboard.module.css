@@ -2,8 +2,8 @@
   padding: 2.5vw;
   font-size: 1.4vh;
   display: grid;
-  grid-template-columns: repeat(8, 5vw);
-  grid-auto-rows: 5vw;
+  grid-template-columns: repeat(8, 8vw);
+  grid-auto-rows: 8vw;
 }
 
 .woodgrainLite {
