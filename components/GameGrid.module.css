@@ -55,7 +55,7 @@
 
 .clock {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   text-align: center;
 }
@@ -63,7 +63,6 @@
 .padded {
   padding: 0.5rem;
   margin: 0 .5rem 0 .5rem;
-  white-space: pre;
 }
 
 .onGreen {
@@ -82,64 +81,23 @@
 
 .red {
   color: red;
+  font-weight: bold;
 }
 
-.underBurger {
-  position: absolute;
-  z-index: 2;
-  top: 6rem;
-  text-align: center;
-  display: flex;
-  flex-direction: row;
+.green {
+  color: green;
+  font-weight: bold;
 }
 
-.button {
-  height: 2rem;
-  width: 7rem;
-  margin: auto;
-  margin-bottom: 1rem;
-  padding-top: 0.3rem;
-  background-color: #80c0ff;
-  border: solid 0.5px #aaa;
-  border-radius: 0.4rem;
-  box-shadow: 1.5px 1.5px 0.2rem #777;
-  color: white;
-}
-
-.button:active {
-  background-color: green;
-}
-
-.ghostedOut {
-  background-color: #aaa;
-}
-
-.blinking {
-  animation-name: blink;
-  animation-delay: 1s;
-  animation-duration: 1.5s;
-  animation-iteration-count: infinite;
-}
-
-@keyframes blink {
-  0% {
-    background-color: #80c0ff;
-  }
-  50% {
-    background-color: blue;
-  }
-  100% {
-    background-color: #80c0ff;
-  }
+.yellow {
+  color: goldenrod;
+  font-weight: bold;
 }
 
 @media only screen and (min-width: 1024px) {
   .triColCenterWide {
     grid-template-columns: 12rem 1fr 6rem;
     gap: 2rem;
-  }
-  .background {
-    min-height: 70vh;
   }
   .burgerBox {
     visibility: hidden;
@@ -152,9 +110,5 @@
   }
   .fourSquare {
     margin: 0 1rem 0 2rem;
-  }
-  .underBurger {
-    top: 8rem;
-    left: 0.5rem;
   }
 }
