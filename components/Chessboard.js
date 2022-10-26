@@ -52,7 +52,7 @@ export default function Chessboard(props) {
               props.setMenu('1');
             } else {
               const pcn = props.org + sq;
-              props.setSeq( s => props.seqIncr(s, pcn) );
+              props.setSeq( props.seqIncr(pcn) );
               props.setOrg('');
             }
           } else if (isSelectedSquare) {
