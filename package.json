@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "chess-sjppd": "^1.0.0",
+    "chess434-ui-data": "^1.0.0",
+    "more-string-434": "^1.0.0",
     "next": "^12.0.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
