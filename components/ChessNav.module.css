@@ -1,0 +1,55 @@
+.underBurger {
+  position: absolute;
+  z-index: 2;
+  top: 6rem;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+}
+
+.button {
+  height: 2rem;
+  width: 7rem;
+  margin: auto;
+  margin-bottom: 1rem;
+  padding-top: 0.3rem;
+  background-color: #80c0ff;
+  border: solid 0.5px #aaa;
+  border-radius: 0.4rem;
+  box-shadow: 1.5px 1.5px 0.2rem #777;
+  color: white;
+}
+
+.button:active {
+  background-color: green;
+}
+
+.ghostedOut {
+  background-color: #aaa;
+}
+
+.blinking {
+  animation-name: blink;
+  animation-delay: 1s;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes blink {
+  0% {
+    background-color: #80c0ff;
+  }
+  50% {
+    background-color: blue;
+  }
+  100% {
+    background-color: #80c0ff;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .underBurger {
+    top: 8rem;
+    left: 0.5rem;
+  }
+}
