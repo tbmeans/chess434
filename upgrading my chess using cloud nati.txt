@@ -1,0 +1,5 @@
+upgrading my chess using cloud native or mobile or php: how about book opening drills practice with accounts so you can track your time-and-accuracy performance on the many different book openings. for these accounts, let's have only minimal auth: just provide email no irl identifying information.
+so this would be first improving the React engine used for board behavior (because there is at least a non-pawn promotion bug) and then building a real backend to deliver book openings to the React/Next frontend to drive the cpu opponent play,
+and need this backend-frontend exchange to follow UCI
+
+beginning to build "shippable" products like this, may be time to look back into freelance for selling wordpress pages and cloud apps and shit
