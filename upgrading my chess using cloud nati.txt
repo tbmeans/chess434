@@ -3,3 +3,6 @@ so this would be first improving the React engine used for board behavior (becau
 and need this backend-frontend exchange to follow UCI
 
 beginning to build "shippable" products like this, may be time to look back into freelance for selling wordpress pages and cloud apps and shit
+
+
+bug observed in chess434 on 20240610: KING PROMOTED TO QUEEN (BUT TRUE PROMOTION ACTUALLY DOES WORK)
